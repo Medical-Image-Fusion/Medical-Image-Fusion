@@ -1,3 +1,4 @@
+% Based on the code made by Mathworks for its Image Fusion Toolbox, found in https://www.mathworks.com/help/wavelet/gs/image-fusion.html
 %clear all;
 
 % Read MRI image and convert it to RGB format %
