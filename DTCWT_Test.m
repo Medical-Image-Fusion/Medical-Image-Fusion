@@ -7,13 +7,13 @@ RGB_CT = ind2rgb(A_CT,map_CT);
 RGB_S = ind2rgb(A_S,map_S);
 
 %% Forward Transform of Images
-imgX1_red = im2uint8(RGB_CT(:,:,1));
-imgX1_green = im2uint8(RGB_CT(:,:,2));
-imgX1_blue = im2uint8(RGB_CT(:,:,3));
+imgX1_red = RGB_CT(:,:,1);
+imgX1_green =RGB_CT(:,:,2);
+imgX1_blue = RGB_CT(:,:,3);
 
-imgX2_red = im2uint8(RGB_S(:,:,1));
-imgX2_green = im2uint8(RGB_S(:,:,2));
-imgX2_blue = im2uint8(RGB_S(:,:,3));
+imgX2_red = RGB_S(:,:,1);
+imgX2_green = RGB_S(:,:,2);
+imgX2_blue = RGB_S(:,:,3);
 
 % CT-images
 impl_CT  = dddtree2('cplxdt',imgX1_red,5,'dtf3');
@@ -70,4 +70,5 @@ image(:,:,2) = dtImage2;
 image(:,:,3) = dtImage3;
 %% show
 figure
+im = im2uint8(image)
 imshow(image)
