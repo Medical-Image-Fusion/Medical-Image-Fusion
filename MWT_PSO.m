@@ -40,7 +40,7 @@ LH_Y = Y(1:N_B, N_B+1:2*N_B, :);
 HL_Y = Y(N_B+1:2*N_B, 1:N_B, :);
 HH_Y = Y(N_B+1:2*N_B, N_B+1:2*N_B, :);
 
-n_particles = 500; % number of particles to use in PSO
+n_particles = 10; % number of particles to use in PSO
 w = zeros(n_particles,8); % weights/particle positions
 p = zeros(n_particles,9); % particles' best known positions + corresponding IFPMs
 g = zeros(8); % swarm's best known position
@@ -84,64 +84,79 @@ for i=1:n_particles
     v(i,:) = -1 + (1+1)*rand(1,8);
 end
 
-
+omegas = [-0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0.1 0.2 0.3 0.4 0.5 0.6];
+phi_ps = [-1 -0.7 -0.6 -0.3 -0.15 -0.08 0.5 1.6 2.1 2.5];
+phi_gs = [0.6 1 1.33 2 2.2 2.3 2.5 2.6 3.2 3.4 3.8 4 4.9];
+best_config = zeros(9);
 max_iter = 10; % termination criterion
-omega = 0.3; % PSO behavioral parameter
-phi_p = 2; % PSO behavioral parameter
-phi_g = 1; % PSO behavioral parameter
-for iter=1:max_iter
-    for i=1:n_particles
-        for d=1:8
-            rp = rand(1);
-            rg = rand(1);
-            
-            % Update particle's velocity %
-            v(i,d) = omega*v(i,d) + phi_p*rp*(p(i,d) - w(i,d)) + phi_g*rg*(g(d) - w(i,d));
-        end
-        
-        % Update particle's position %
-        w(i,:) = w(i,:) + v(i,:);
-        
-        % Fusion of sub-bands based on new weights %
-        LL_F = w(i,1)*LL_X + w(i,2)*LL_Y;
-        LH_F = w(i,3)*LH_X + w(i,4)*LH_Y;
-        HL_F = w(i,5)*HL_X + w(i,6)*HL_Y;
-        HH_F = w(i,7)*HH_X + w(i,8)*HH_Y;
-    
-        % Concatenate resulting sub-bands %
-        F = [LL_F,LH_F;HL_F,HH_F];    
 
-        % Perform Inverse Multiwavelet transform on RGB channels %
-        F_Red = IGHM(F(:,:,1));
-        F_Green = IGHM(F(:,:,2));
-        F_Blue = IGHM(F(:,:,3));
-    
-        % Concatenate RGB channels %
-        F = cat(3,F_Red,F_Green,F_Blue);
-    
-        % Compute IFPM of new solution %
-        ifpm_w = IFPM(im2uint8(A_RGB), im2uint8(B_RGB), im2uint8(F));
+for omega_i=1:size(omegas,2)
+    for phi_p_i=1:size(phi_ps,2)
+        for phi_g_i=1:size(phi_gs,2)
+            
+            for iter=1:max_iter
+                for i=1:n_particles
+                    for d=1:8
+                        rp = rand(1);
+                        rg = rand(1);
+            
+                        % Update particle's velocity %
+                        v(i,d) = omegas(omega_i)*v(i,d) + phi_ps(phi_p_i)*rp*(p(i,d) - w(i,d)) + phi_gs(phi_g_i)*rg*(g(d) - w(i,d));
+                    end
         
-        % Update the particle's best known position %
-        if(ifpm_w > p(i,9))
-            p(i,1:8) = w(i,:);
-            p(i,9) = ifpm_w;
-            % Update the swarm's best known position %
-            if(p(i,9) > ifpm_g)
-                ifpm_g = p(i,9);
-                g = p(i,1:8);
+                    % Update particle's position %
+                    w(i,:) = w(i,:) + v(i,:);
+        
+                    % Fusion of sub-bands based on new weights %
+                    LL_F = w(i,1)*LL_X + w(i,2)*LL_Y;
+                    LH_F = w(i,3)*LH_X + w(i,4)*LH_Y;
+                    HL_F = w(i,5)*HL_X + w(i,6)*HL_Y;
+                    HH_F = w(i,7)*HH_X + w(i,8)*HH_Y;
+    
+                    % Concatenate resulting sub-bands %
+                    F = [LL_F,LH_F;HL_F,HH_F];    
+
+                    % Perform Inverse Multiwavelet transform on RGB channels %
+                    F_Red = IGHM(F(:,:,1));
+                    F_Green = IGHM(F(:,:,2));
+                    F_Blue = IGHM(F(:,:,3));
+    
+                    % Concatenate RGB channels %
+                    F = cat(3,F_Red,F_Green,F_Blue);
+    
+                    % Compute IFPM of new solution %
+                    ifpm_w = IFPM(im2uint8(A_RGB), im2uint8(B_RGB), im2uint8(F));
+        
+                    % Update the particle's best known position %
+                    if(ifpm_w > p(i,9))
+                        p(i,1:8) = w(i,:);
+                        p(i,9) = ifpm_w;
+                        % Update the swarm's best known position %
+                        if(p(i,9) > ifpm_g)
+                            ifpm_g = p(i,9);
+                            g = p(i,1:8);
+                        end
+                    end
+                end
+                verbose = sprintf('Iteration: %d',iter);
+                disp(verbose);
             end
+            
+            if(ifpm_g > best_config(9))
+                best_config(9) = ifpm_g;
+                best_config(1:8) = g;
+            end
+            verbose = sprintf('Configuration: %d %d %d ====> IFPM = %f',omega_i, phi_p_i, phi_g_i, best_config(9));
+            disp(verbose);
         end
     end
-  verbose = sprintf('Iteration: %d',iter);
-  disp(verbose);
 end
 
 % Fusion of sub-bands based on optimal weights %
-LL_F = g(1)*LL_X + g(2)*LL_Y;
-LH_F = g(3)*LH_X + g(4)*LH_Y;
-HL_F = g(5)*HL_X + g(6)*HL_Y;
-HH_F = g(7)*HH_X + g(8)*HH_Y;
+LL_F = best_config(1)*LL_X + best_config(2)*LL_Y;
+LH_F = best_config(3)*LH_X + best_config(4)*LH_Y;
+HL_F = best_config(5)*HL_X + best_config(6)*HL_Y;
+HH_F = best_config(7)*HH_X + best_config(8)*HH_Y;
 
 % Concatenate resulting sub-bands %
 F = [LL_F,LH_F;HL_F,HH_F];    
@@ -155,4 +170,6 @@ F_Blue = IGHM(F(:,:,3));
 F = cat(3,F_Red,F_Green,F_Blue);
     
 % Compute IFPM of optimal solution %
-ifpm_o = IFPM(im2uint8(A_RGB), im2uint8(B_RGB), im2uint8(F));
+ifpm_o = best_config(9);
+
+save('best_config.mat', 'best_config');
