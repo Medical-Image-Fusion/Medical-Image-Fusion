@@ -1,11 +1,4 @@
-% Read MRI image and convert it to RGB format %
-[A,map] = imread("MRI.gif",1); 
-A_RGB = ind2rgb(A,map);
-
-% Read SPECT image and convert it to RGB format %
-[B,map] = imread("SPECT.gif",1);
-B_RGB = ind2rgb(B,map);
-
+function [ifpm_o, F] = MWT_PSO(A_RGB, B_RGB)
 % Perform Single-Level 2D Multiwavelet decomposition on RGB channels of MRI image %  
 X_Red = GHM(A_RGB(:,:,1));
 X_Green = GHM(A_RGB(:,:,2));
@@ -194,4 +187,4 @@ F = cat(3,F_Red,F_Green,F_Blue);
 % Compute IFPM of optimal solution %
 ifpm_o = best_config(9);
 
-save('best_config.mat', 'best_config');
+%%save('best_config.mat', 'best_config');
