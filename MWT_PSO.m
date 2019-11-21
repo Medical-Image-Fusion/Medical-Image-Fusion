@@ -40,7 +40,7 @@ LH_Y = Y(1:N_B, N_B+1:2*N_B, :);
 HL_Y = Y(N_B+1:2*N_B, 1:N_B, :);
 HH_Y = Y(N_B+1:2*N_B, N_B+1:2*N_B, :);
 
-n_particles = 10; % number of particles to use in PSO
+n_particles = 25; % number of particles to use in PSO
 w = zeros(n_particles,8); % weights/particle positions
 p = zeros(n_particles,9); % particles' best known positions + corresponding IFPMs
 g = zeros(8); % swarm's best known position
@@ -84,11 +84,16 @@ for i=1:n_particles
     v(i,:) = -1 + (1+1)*rand(1,8);
 end
 
-omegas = [-0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0.1 0.2 0.3 0.4 0.5 0.6];
-phi_ps = [-1 -0.7 -0.6 -0.3 -0.15 -0.08 0.5 1.6 2.1 2.5];
-phi_gs = [0.6 1 1.33 2 2.2 2.3 2.5 2.6 3.2 3.4 3.8 4 4.9];
+%omegas = [-0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0.1 0.2 0.3 0.4 0.5 0.6];
+omegas = [-0.6 -0.4 -0.2 0.1 0.3 0.5];
+phi_ps = [-1 -0.6 -0.15 0.5 2.1 2.5];
+phi_gs = [0.6 1.33 2.2 2.6 3.4 4 4.9];
 best_config = zeros(9);
 max_iter = 10; % termination criterion
+
+ifpm_g_last = 0;
+count = 0;
+term = 0;
 
 for omega_i=1:size(omegas,2)
     for phi_p_i=1:size(phi_ps,2)
@@ -146,9 +151,26 @@ for omega_i=1:size(omegas,2)
                 best_config(9) = ifpm_g;
                 best_config(1:8) = g;
             end
+            
+            if(ifpm_g - ifpm_g_last < 0.000001)
+                count = count + 1;
+            end
+            ifpm_g_last = ifpm_g;
+            
             verbose = sprintf('Configuration: %d %d %d ====> IFPM = %f',omega_i, phi_p_i, phi_g_i, best_config(9));
             disp(verbose);
+            
+            if(count == 5)
+                term = 1;
+                break
+            end
         end
+        if(term == 1)
+            break
+        end
+    end
+    if(term == 1)
+        break
     end
 end
 
