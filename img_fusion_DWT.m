@@ -44,6 +44,6 @@ end
 disp('Saving the whole workspace, just in case');
 save('image_fusion_workspace') % Save the whole workspace, just in case
 
-function parsave(name, ifpm) %Auxilairy saving function
-    save(strcat(name,'.mat'), 'ifpm');
+function parsave(name, ifpm_array) %Auxiliary saving function
+    save(strcat(name,'.mat'), 'ifpm_array');
 end
