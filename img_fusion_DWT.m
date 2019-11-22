@@ -1,4 +1,5 @@
-% Get the list of images andcreate the folder for the output images
+% Get the list of images and create the folder for the output images, if it
+% doesn't exist
 cd ECE613_Images
 if ~exist('Fused' , 'dir')
     mkdir('Fused')
@@ -13,30 +14,36 @@ PETFiles = dir('*.gif');
 cd ..
 cd ..
 
+saveFolder = 'ECE613_Images/Fused/Fused_';
 
 ifpm = zeros(length(MRIFiles), 9); %Create the basic ifmp array
-fileOrder = repmat(' ', length(MRIFiles), 1); %Create the string array to know the order for which the imgs were loaded
 
 parfor k = 1:length(MRIFiles)
-  baseFileName = MRIFiles(k).name; %Get the name of one of the images on the list
-  %fileOrder(k) = MRIFiles(k).name; %Save the name on the array
-  fullFileNameMRI = fullfile(MRIFolder, baseFileName); %Get the file path for the MRI image
+  baseFileNameMRI = MRIFiles(k).name; %Get the name of one of the MRI images on the list
+  baseFileNamePET = PETFiles(k).name; %Get the name of one of the PET images on the list
+  fullFileNameMRI = fullfile(MRIFolder, baseFileNameMRI); %Get the file path for the MRI image
+  fullFileNamePET = fullfile(PETFolder, baseFileNamePET); %Get the file path for the PET image
+  
   disp(strcat('Now reading: ', fullFileNameMRI));
-  fullFileNamePET = fullfile(PETFolder, baseFileName); %Get the file path for the PET image
-  disp(strcat('Now reading: ', fullFileNamePET));
-  [A,map] = imread(fullFileNameMRI,1); %Load the RMI img
+  [A,map] = imread(fullFileNameMRI,1); %Load the MRI img
   A_RGB = ind2rgb(A,map);
+  disp(strcat('Now reading: ', fullFileNamePET));
   [B,map] = imread(fullFileNamePET,1); %Load the PET img
   B_RGB = ind2rgb(B,map);
-  [ifpm_k, fused_img] = MWT_PSO(A_RGB, B_RGB); %Run the PSO function and return the fused img + the coeff used
+
+  [ifpm_k, fused_img] = DWT_PSO(A_RGB, B_RGB); %Run the PSO function and return the fused img + the coeff used
   ifpm(k,:) = ifpm_k; %Assign the coeff to the array
   
-  name = baseFileName(1:end-4); % Get the name of the img
-  imwrite(fused_img, strcat('ECE613_Images/Fused/Fused_', name,'.png')) %Save the fused img
-  parsave(ifpm_k, name); % Save the .mat with the coefficients and ifpm
-
-%   imageArray = imread(fullFileName);
-%   imshow(imageArray);  % Display image.
-%   drawnow; % Force display to update immediately.
+  name = baseFileNameMRI(1:end-4); % Get the name of the img
+  fusedImgName = strcat(saveFolder, name,'.png'); %Create the fused image name
+  disp(strcat('Saving fused image and .mat for: ', fusedImgName));
+  imwrite(fused_img, fusedImgName) %Save the fused img
+  parsave(strcat(saveFolder, name), ifpm_k); % Save the .mat with the coefficients and ifpm
 end
+
+disp('Saving the whole workspace, just in case');
 save('image_fusion_workspace') % Save the whole workspace, just in case
+
+function parsave(name, ifpm) %Auxilairy saving function
+    save(strcat(name,'.mat'), 'ifpm');
+end
