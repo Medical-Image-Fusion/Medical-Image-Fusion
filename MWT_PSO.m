@@ -1,4 +1,4 @@
-function [ifpm_o, F] = MWT_PSO(A_RGB, B_RGB)
+function [best_config, F] = MWT_PSO(A_RGB, B_RGB)
 % Perform Single-Level 2D Multiwavelet decomposition on RGB channels of MRI image %  
 X_Red = GHM(A_RGB(:,:,1));
 X_Green = GHM(A_RGB(:,:,2));
@@ -81,7 +81,7 @@ end
 omegas = [-0.6 -0.4 -0.2 0.1 0.3 0.5];
 phi_ps = [-1 -0.6 -0.15 0.5 2.1 2.5];
 phi_gs = [0.6 1.33 2.2 2.6 3.4 4 4.9];
-best_config = zeros(9);
+best_config = zeros(1,9);
 max_iter = 10; % termination criterion
 
 ifpm_g_last = 0;
