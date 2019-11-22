@@ -1,4 +1,4 @@
-function [ifpm_o, F] = DWT_PSO(x1_RGB, x2_RGB)
+function [best_config, F] = DWT_PSO(x1_RGB, x2_RGB)
 % Perform Single-Level 2D Multiwavelet decomposition on RGB channels of MRI image %  
 x1_Red = (x1_RGB(:,:,1));
 x1_Green = (x1_RGB(:,:,2));
@@ -80,7 +80,7 @@ end
 omegas = [-0.6 -0.4 -0.2 0.1 0.3 0.5];
 phi_ps = [-1 -0.6 -0.15 0.5 2.1 2.5];
 phi_gs = [0.6 1.33 2.2 2.6 3.4 4 4.9];
-best_config = zeros(9);
+best_config = zeros(1,9);
 max_iter = 10; % termination criterion
 
 ifpm_g_last = 0;
