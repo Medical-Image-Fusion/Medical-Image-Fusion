@@ -10,12 +10,12 @@ img1_RGB = ind2rgb(img1,map);
 [img2,map] = imread("SPECT.gif",1);
 img2_RGB = ind2rgb(img2,map);
 
-% Perform Single-Level 2D Multiwavelet decomposition on RGB channels of MRI image %  
+% Perform Single-Level Discrete wavelet decomposition on RGB channels of MRI image %  
 img1_Red = (img1_RGB(:,:,1));
 img1_Green = (img1_RGB(:,:,2));
 img1_Blue = (img1_RGB(:,:,3));
 
-% Perform Single-Level 2D Multiwavelet decomposition on RGB channels of SPECT image % 
+% Perform Single-Level Discrete wavelet decomposition on RGB channels of SPECT image % 
 img2_Red = (img2_RGB(:,:,1));
 img2_Green = (img2_RGB(:,:,2));
 img2_Blue = (img2_RGB(:,:,3));
