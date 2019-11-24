@@ -16,7 +16,7 @@ cd ..
 
 saveFolder = 'ECE613_Images/Fused/Fused_';
 
-ifpm = zeros(length(MRIFiles), 9); %Create the basic ifmp array
+ifpm = zeros(length(MRIFiles), 15); %Create the basic ifmp array
 
 parfor k = 1:length(MRIFiles)
   baseFileNameMRI = MRIFiles(k).name; %Get the name of one of the MRI images on the list
