@@ -14,7 +14,7 @@ PETFiles = dir('*.gif');
 cd ..
 cd ..
 
-saveFolder = 'ECE613_Images/Fused/Fused_';
+saveFolder = 'ECE613_Images/Fused/FusedDWT_';
 
 ifpm = zeros(length(MRIFiles), 9); %Create the basic ifmp array
 
@@ -42,7 +42,7 @@ parfor k = 1:length(MRIFiles)
 end
 
 disp('Saving the whole workspace, just in case');
-save('image_fusion_workspace') % Save the whole workspace, just in case
+save('image_fusion_workspace_DWT') % Save the whole workspace, just in case
 
 function parsave(name, ifpm_array) %Auxiliary saving function
     save(strcat(name,'.mat'), 'ifpm_array');
