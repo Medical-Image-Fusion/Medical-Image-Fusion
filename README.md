@@ -10,3 +10,5 @@ Medical Image Fusion using wavelets
 Run img_fusion.m to get the results of the optimization tuning and the fused images using multiwavelet transform
 
 Run img_fusion_DWT.m to get the results of the optimization tuning and the fused images using discrete wavelet transform
+
+[Testing](testing.com)
